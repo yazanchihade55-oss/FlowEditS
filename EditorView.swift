@@ -2,6 +2,7 @@ import AVKit
 import Photos
 import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct Movie: Transferable {
     let url: URL
@@ -67,7 +68,7 @@ struct EditorView: View {
                 if m.sourceURL != nil {
                     VideoPlayer(player: m.player).frame(height: 300)
                 } else {
-                    Text("Wähle ein Video").frame(height: 300).frame(maxWidth: .infinity).background(.black.opacity(0.1))
+                    Text("Wähle ein Video").frame(height: 300).frame(maxWidth: .infinity).background(Color.black.opacity(0.1))
                 }
                 Form {
                     Section("Schnitt") {
@@ -95,8 +96,8 @@ struct EditorView: View {
             }
             .navigationTitle("FlowEdit")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) { PhotosPicker("Video", selection: $pick, matching: .videos) }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) { PhotosPicker("Video", selection: $pick, matching: .videos) }
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Export") { Task { await m.exportToPhotos() } }.disabled(m.sourceURL == nil)
                 }
             }
