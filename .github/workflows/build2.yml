@@ -1,0 +1,25 @@
+name: Build IPA mit Fehleranzeige
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: Build
+        run: |
+          xcodebuild -project FlowEdit.xcodeproj -scheme FlowEdit \
+            -configuration Release -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build > build.log 2>&1 || { grep "error:" build.log | sort -u | head -20; exit 1; }
+      - run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/FlowEdit.app Payload/
+          zip -qr FlowEdit.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FlowEdit-ipa
+          path: FlowEdit.ipa
